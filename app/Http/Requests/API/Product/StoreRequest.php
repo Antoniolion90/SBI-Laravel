@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Category;
+namespace App\Http\Requests\API\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateRequest extends FormRequest
+class StoreRequest extends FormRequest
 {
 
     /**
@@ -16,6 +16,9 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'min:2', 'max:255'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'barcode' => ['required', 'string', 'regex:/^\d{13}$/', 'unique:products'],
+            'category_id' => ['required', 'exists:categories,id'],
         ];
     }
 }

@@ -3,49 +3,45 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Category\StoreRequest;
-use App\Http\Requests\Category\UpdateRequest;
+use App\Http\Requests\API\Category\StoreRequest;
+use App\Http\Requests\API\Category\UpdateRequest;
+use App\Http\Resources\API\CategoryResource;
 use App\Models\Category;
+use App\Repositories\CategoryRepository;
+use Illuminate\Http\JsonResponse;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct(
+        protected CategoryRepository $repository
+    ) {}
+
+    public function index(): JsonResponse
     {
-        //
+        $categories = $this->repository->all();
+        return response()->json(CategoryResource::collection($categories));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreRequest $request)
+    public function store(StoreRequest $request): JsonResponse
     {
-        $data = $request->validated();
+        $category = $this->repository->create($request->validated());
+        return response()->json(new CategoryResource($category), 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Category $category)
+    public function show(Category $category): JsonResponse
     {
-        //
+        return response()->json(new CategoryResource($category));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateRequest $request, Category $category)
+    public function update(UpdateRequest $request, Category $category): JsonResponse
     {
-        $data = $request->validated();
+        $updatedCategory = $this->repository->update($category, $request->validated());
+        return response()->json(new CategoryResource($updatedCategory));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Category $category)
+    public function destroy(Category $category): JsonResponse
     {
-        //
+        $category->delete();
+        return response()->json(null, 204);
     }
 }

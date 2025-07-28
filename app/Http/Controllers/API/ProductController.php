@@ -3,49 +3,45 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Product\StoreRequest;
-use App\Http\Requests\Product\UpdateRequest;
+use App\Http\Requests\API\Product\StoreRequest;
+use App\Http\Requests\API\Product\UpdateRequest;
+use App\Http\Resources\API\ProductResource;
 use App\Models\Product;
+use App\Repositories\ProductRepository;
+use Illuminate\Http\JsonResponse;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct(
+        protected ProductRepository $repository
+    ) {}
+
+    public function index(): JsonResponse
     {
-        //
+        $products = $this->repository->all();
+        return response()->json(ProductResource::collection($products));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreRequest $request)
+    public function store(StoreRequest $request): JsonResponse
     {
-        $data = $request->validated();
+        $product = $this->repository->create($request->validated());
+        return response()->json(new ProductResource($product), 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Product $product)
+    public function show(Product $product): JsonResponse
     {
-        //
+        return response()->json(new ProductResource($product));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateRequest $request, Product $product)
+    public function update(UpdateRequest $request, Product $product): JsonResponse
     {
-        //
+        $updated = $this->repository->update($product, $request->validated());
+        return response()->json(new ProductResource($updated));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Product $product)
+    public function destroy(Product $product): JsonResponse
     {
-        //
+        $product->delete();
+        return response()->json(null, 204);
     }
 }
