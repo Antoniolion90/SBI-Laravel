@@ -2,15 +2,18 @@
 
 namespace App\Exports;
 
-use App\Models\Product;
-use Maatwebsite\Excel\Concerns\FromArray;
+use App\Repositories\ProductRepository;
+use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class ProductExport implements FromArray, WithHeadings
+class ProductExport implements FromCollection, WithHeadings
 {
-    public function array(): array
+    public function collection(): Collection
     {
-        return Product::with('category')->get()
+        $productRepository = app(ProductRepository::class);
+
+        return $productRepository->all()
             ->map(function ($product) {
                 return [
                     $product->name,
@@ -18,7 +21,7 @@ class ProductExport implements FromArray, WithHeadings
                     $product->price,
                     $product->category->name,
                 ];
-            })->toArray();
+            });
     }
 
     public function headings(): array

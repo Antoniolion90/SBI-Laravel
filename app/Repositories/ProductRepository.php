@@ -10,14 +10,17 @@ class ProductRepository
 {
     public function all(): Collection
     {
-        return Product::with('category')->get();
+        return Product::query()
+            ->select('id', 'name', 'barcode', 'price', 'category_id')
+            ->with('category:id,name')
+            ->get();
     }
 
     public function create(array $data): Product
     {
         return DB::transaction(function () use ($data) {
             $product = Product::create($data);
-            return $product->load('category');
+            return $product->load('category:id,name');
         });
     }
 
@@ -25,7 +28,7 @@ class ProductRepository
     {
         return DB::transaction(function () use ($product, $data) {
             $product->update($data);
-            return $product->fresh('category');
+            return $product->fresh('category:id,name');
         });
     }
 }

@@ -30,7 +30,7 @@ class ProductController extends Controller
 
     public function show(Product $product): JsonResponse
     {
-        $product->load('category');
+        $product->load('category:id,name');
 
         return response()->json(new ProductResource($product));
     }

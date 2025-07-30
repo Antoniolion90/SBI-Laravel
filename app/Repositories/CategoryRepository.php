@@ -10,7 +10,9 @@ class CategoryRepository
 {
     public function all(): Collection
     {
-        return Category::all();
+        return Category::query()
+            ->select('id', 'name')
+            ->get();
     }
 
     public function create(array $data): Category
